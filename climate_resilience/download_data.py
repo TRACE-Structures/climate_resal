@@ -1,7 +1,8 @@
 import earthkit.data
 import os
 import json
-
+import requests
+import io
 
 
 def download_dfs(requests, dictionay_name):
@@ -77,8 +78,13 @@ def run_all_models(json_file,variable):
     """
 
     dfs_models = {}                                                  # Main dictionary
-    with open(json_file) as f:
-        models = json.load(f)                                        # Read models from json file
+    if json_file.startswith('http'):
+        response = requests.get(json_file)
+        response.raise_for_status()
+        models = response.json()
+    else:
+        with open(json_file) as f:
+            models = json.load(f)
     for model in models:                                             # Iterate through the models and download the data
         gcm = models[model]["gcm"]
         rcm = models[model]["rcm"]
